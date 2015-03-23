@@ -183,6 +183,48 @@ LUA_API void *(lua_newuserdata) (lua_State *L, size_t sz);
 LUA_API int   (lua_getmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_getfenv) (lua_State *L, int idx);
 
+#if LUA_PROFILE
+typedef struct lua_Statdata {
+  long max;
+  long min;
+  long avg;
+  long cnt;
+} lua_Statdata;
+
+typedef struct lua_Objectinfo {
+  long count; /* object count */
+  long bytes; /* total size of all object */
+} lua_Objectinfo;
+
+typedef struct lua_Heapinfo {
+  long allocbytes; /* allocated heap object bytes */
+  long freebytes; /* freed heap object bytes */
+  long totalbytes; /* current heap object bytes */
+  long totalcount; /* current heap object number */
+} lua_Heapinfo;
+
+LUA_API long (lua_stackresizecount) (lua_State *L, int idx);
+LUA_API long (lua_ciresizecount) (lua_State *L, int idx);
+LUA_API long (lua_tableresizecount) (lua_State *L, int idx);
+LUA_API void (lua_gcsteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_marksteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_sweepstringsteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_sweepsteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_finalizesteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_heapinfo) (lua_State *L, lua_Heapinfo *hi);
+LUA_API void (lua_tableinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_protoinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_lclosureinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_cclosureinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_closureinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_threadinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_openupvalinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_closeupvalinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_upvalinfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_userdatainfo) (lua_State *L, lua_Objectinfo *oi);
+LUA_API void (lua_stringinfo) (lua_State *L, lua_Objectinfo *oi);
+#endif 
+
 
 /*
 ** set functions (stack -> Lua)

@@ -143,6 +143,10 @@ void luaD_reallocstack (lua_State *L, int newsize) {
   int realsize = newsize + 1 + EXTRA_STACK;
   lua_assert(L->stack_last - L->stack == L->stacksize - EXTRA_STACK - 1);
   luaM_reallocvector(L, L->stack, L->stacksize, realsize, TValue);
+#if LUA_PROFILE
+  G(L)->threadbytes += (realsize-L->stacksize)*sizeof(TValue);
+  L->stackresizecount++;
+#endif
   L->stacksize = realsize;
   L->stack_last = L->stack+newsize;
   correctstack(L, oldstack);
@@ -152,6 +156,10 @@ void luaD_reallocstack (lua_State *L, int newsize) {
 void luaD_reallocCI (lua_State *L, int newsize) {
   CallInfo *oldci = L->base_ci;
   luaM_reallocvector(L, L->base_ci, L->size_ci, newsize, CallInfo);
+#if LUA_PROFILE
+  G(L)->threadbytes += (newsize-L->size_ci)*sizeof(CallInfo);
+  L->ciresizecount++;
+#endif
   L->size_ci = newsize;
   L->ci = (L->ci - oldci) + L->base_ci;
   L->end_ci = L->base_ci + L->size_ci - 1;
@@ -487,6 +495,22 @@ struct SParser {  /* data to `f_parser' */
   const char *name;
 };
 
+#if LUA_PROFILE
+static long protosize (Proto *p) {
+  int i;
+  long size = p->sizecode * sizeof(Instruction) \
+		+ p->sizep * sizeof(Proto *) \
+		+ p->sizek * sizeof(TValue) \
+		+ p->sizelineinfo * sizeof(int) \
+		+ p->sizelocvars * sizeof(struct LocVar) \
+		+ p->sizeupvalues * sizeof(TString *) \
+		+ sizeof(Proto);
+  for (i=0; i<p->sizep; i++)
+    size += protosize(p->p[i]);
+  return size;
+}
+#endif
+
 static void f_parser (lua_State *L, void *ud) {
   int i;
   Proto *tf;
@@ -496,6 +520,9 @@ static void f_parser (lua_State *L, void *ud) {
   luaC_checkGC(L);
   tf = ((c == LUA_SIGNATURE[0]) ? luaU_undump : luaY_parser)(L, p->z,
                                                              &p->buff, p->name);
+#if LUA_PROFILE
+  G(L)->protobytes += protosize(tf);
+#endif
   cl = luaF_newLclosure(L, tf->nups, hvalue(gt(L)));
   cl->l.p = tf;
   for (i = 0; i < tf->nups; i++)  /* initialize eventual upvalues */

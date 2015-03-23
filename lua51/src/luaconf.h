@@ -757,6 +757,9 @@ union luai_Cast { double l_d; long l_l; };
 ** without modifying the main part of the file.
 */
 
+#if !defined(LUA_PROFILE)
+#define LUA_PROFILE 1
+#endif
 
 
 #endif

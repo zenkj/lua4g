@@ -66,6 +66,10 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
   ts->tsv.next = tb->hash[h];  /* chain new entry */
   tb->hash[h] = obj2gco(ts);
   tb->nuse++;
+#if LUA_PROFILE
+  G(L)->stringcount++;
+  G(L)->stringbytes += (l+1)*sizeof(char)+sizeof(TString);
+#endif
   if (tb->nuse > cast(lu_int32, tb->size) && tb->size <= MAX_INT/2)
     luaS_resize(L, tb->size*2);  /* too crowded */
   return ts;
@@ -106,6 +110,10 @@ Udata *luaS_newudata (lua_State *L, size_t s, Table *e) {
   /* chain it on udata list (after main thread) */
   u->uv.next = G(L)->mainthread->next;
   G(L)->mainthread->next = obj2gco(u);
+#if LUA_PROFILE
+  G(L)->udatacount++;
+  G(L)->udatabytes += s + sizeof(Udata);
+#endif
   return u;
 }
 

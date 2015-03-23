@@ -61,6 +61,26 @@ typedef struct CallInfo {
 #define f_isLua(ci)	(!ci_func(ci)->c.isC)
 #define isLua(ci)	(ttisfunction((ci)->func) && f_isLua(ci))
 
+#if LUA_PROFILE
+/* statistic data */
+typedef struct statdata {
+  long acc; /* temporary accumulator */
+  long max; /* maximum value */
+  long min; /* minimum value */
+  long avg; /* average value */
+  long cnt; /* count */
+} statdata;
+
+#define statinit(sd) \
+  { statdata *p=(sd); p->acc=p->max=p->min=p->avg=p->cnt=0; }
+#define statacc(sd) { (sd)->acc++; }
+#define statloop(sd) \
+  { statdata *p = (sd); long acc = p->acc; \
+    p->max = p->max < acc ? acc : p->max; \
+    p->min = p->min > acc ? acc : p->min; \
+    p->avg = (p->avg*p->cnt+acc)/(p->cnt+1); \
+    p->cnt++; p->acc = 0; }
+#endif
 
 /*
 ** `global state', shared by all threads of this state
@@ -91,6 +111,33 @@ typedef struct global_State {
   UpVal uvhead;  /* head of double-linked list of all open upvalues */
   struct Table *mt[NUM_TAGS];  /* metatables for basic types */
   TString *tmname[TM_N];  /* array with tag-method names */
+#if LUA_PROFILE
+  /* GC related profiling data */
+  statdata gcsteps;
+  statdata marksteps;
+  statdata sweepstringsteps;
+  statdata sweepsteps;
+  statdata finalizesteps;
+  long allocbytes;
+  long freebytes;
+  long tablecount;
+  long protocount;
+  long lclosurecount;
+  long cclosurecount;
+  long threadcount;
+  long openupvalcount;
+  long closeupvalcount;
+  long udatacount;
+  long stringcount;
+  long tablebytes;
+  long protobytes;
+  long lclosurebytes;
+  long cclosurebytes;
+  long threadbytes;
+  long upvalbytes;
+  long udatabytes;
+  long stringbytes;
+#endif
 } global_State;
 
 
@@ -124,6 +171,10 @@ struct lua_State {
   GCObject *gclist;
   struct lua_longjmp *errorJmp;  /* current error recover point */
   ptrdiff_t errfunc;  /* current error handling function (stack index) */
+#if LUA_PROFILE
+  long stackresizecount;
+  long ciresizecount;
+#endif
 };
 
 

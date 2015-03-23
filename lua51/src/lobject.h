@@ -345,6 +345,9 @@ typedef struct Table {
   Node *lastfree;  /* any free position is before this position */
   GCObject *gclist;
   int sizearray;  /* size of `array' array */
+#if LUA_PROFILE
+  long resizecount;
+#endif
 } Table;
 
 
