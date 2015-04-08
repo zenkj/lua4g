@@ -67,19 +67,26 @@ typedef struct statdata {
   long acc; /* temporary accumulator */
   long max; /* maximum value */
   long min; /* minimum value */
-  long avg; /* average value */
+  double avg; /* average value */
   long cnt; /* count */
 } statdata;
 
 #define statinit(sd) \
-  { statdata *p=(sd); p->acc=p->max=p->min=p->avg=p->cnt=0; }
+  { statdata *p=(sd); p->acc=p->max=p->min=p->cnt=0; p->avg=0.0;}
 #define statacc(sd) { (sd)->acc++; }
+#define statacc1(sd, v) { (sd)->acc = (v); }
 #define statloop(sd) \
-  { statdata *p = (sd); long acc = p->acc; \
+  { statdata *p=(sd); long acc=p->acc; \
     p->max = p->max < acc ? acc : p->max; \
     p->min = p->min > acc ? acc : p->min; \
     p->avg = (p->avg*p->cnt+acc)/(p->cnt+1); \
     p->cnt++; p->acc = 0; }
+#define statloop1(sd,v) \
+  { statdata *p=(sd); long v1=(v); long acc=v1-p->acc; \
+    p->max = p->max < acc ? acc : p->max; \
+    p->min = p->min > acc ? acc : p->min; \
+    p->avg = (p->avg*p->cnt+acc)/(p->cnt+1); \
+    p->cnt++; p->acc = v1; }
 #endif
 
 /*
@@ -118,6 +125,8 @@ typedef struct global_State {
   statdata sweepstringsteps;
   statdata sweepsteps;
   statdata finalizesteps;
+  statdata gcperiod;
+  statdata nogcperiod;
   long allocbytes;
   long freebytes;
   long tablecount;
@@ -215,6 +224,9 @@ union GCObject {
 
 LUAI_FUNC lua_State *luaE_newthread (lua_State *L);
 LUAI_FUNC void luaE_freethread (lua_State *L, lua_State *L1);
+#if LUA_PROFILE
+LUAI_FUNC long luaE_nanosecond ();
+#endif
 
 #endif
 

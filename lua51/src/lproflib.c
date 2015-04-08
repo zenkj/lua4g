@@ -14,6 +14,7 @@
 
 
 #if LUA_PROFILE
+#include <time.h>
 
 static int prof_stackresizecount (lua_State *L) {
   int n = lua_gettop(L);
@@ -84,6 +85,26 @@ static int prof_sweepsteps (lua_State *L) {
 static int prof_finalizesteps (lua_State *L) {
   lua_Statdata sd;
   lua_finalizesteps(L, &sd);
+  lua_pushinteger(L, sd.max);
+  lua_pushinteger(L, sd.min);
+  lua_pushinteger(L, sd.avg);
+  lua_pushinteger(L, sd.cnt);
+  return 4;
+}
+
+static int prof_gcperiod (lua_State *L) {
+  lua_Statdata sd;
+  lua_gcperiod(L, &sd);
+  lua_pushinteger(L, sd.max);
+  lua_pushinteger(L, sd.min);
+  lua_pushinteger(L, sd.avg);
+  lua_pushinteger(L, sd.cnt);
+  return 4;
+}
+
+static int prof_nogcperiod (lua_State *L) {
+  lua_Statdata sd;
+  lua_nogcperiod(L, &sd);
   lua_pushinteger(L, sd.max);
   lua_pushinteger(L, sd.min);
   lua_pushinteger(L, sd.avg);
@@ -169,6 +190,13 @@ static int prof_stringinfo (lua_State *L) {
   return 2;
 }
 
+static int prof_nanosecond (lua_State *L) {
+  struct timespec ts;
+  clock_gettime(CLOCK_REALTIME, &ts);
+  lua_pushnumber(L, (lua_Number)(ts.tv_sec*1000*1000*1000)+(lua_Number)ts.tv_nsec);
+  return 1;
+}
+
 static int prof_help (lua_State *L) {
   lua_pushliteral(L, ""
     "stackresizecount(thread): resize count of stack array in the thread.\n"
@@ -184,6 +212,10 @@ static int prof_help (lua_State *L) {
     "                          period and number of gc period.\n"
     "finalizesteps():          maximum/minumum/average finalize steps in one gc\n"
     "                          period and number of gc period.\n"
+    "gcperiod():               maximum/minumum/average time of gc period in\n"
+    "                          nanoseconds and number of gc period.\n"
+    "nogcperiod():             maximum/minumum/average time between gc period in\n"
+    "                          nanoseconds and number of no gc period.\n"
     "heapinfo():               allocated bytes/freed bytes/total bytes/total\n"
     "                          number of heap objects.\n"
     "tableinfo():              table object number/total table object size.\n"
@@ -197,6 +229,7 @@ static int prof_help (lua_State *L) {
     "                          closed upval number/closed upval size.\n"
     "userdatainfo():           userdata number/total userdata object size.\n"
     "stringinfo():             string number/total string object size.\n"
+    "nanosecond():             nanoseconds from clock_gettime(REALTIME).\n"
     "help():                   display this help message.\n");
 
   return 1;
@@ -211,6 +244,8 @@ static const luaL_Reg proflib[] = {
   {"sweepstringsteps",   prof_sweepstringsteps},
   {"sweepsteps",         prof_sweepsteps},
   {"finalizesteps",      prof_finalizesteps},
+  {"gcperiod",           prof_gcperiod},
+  {"nogcperiod",         prof_nogcperiod},
   {"heapinfo",           prof_heapinfo},
   {"tableinfo",          prof_tableinfo},
   {"protoinfo",          prof_protoinfo},
@@ -219,6 +254,7 @@ static const luaL_Reg proflib[] = {
   {"upvalinfo",          prof_upvalinfo},
   {"userdatainfo",       prof_userdatainfo},
   {"stringinfo",         prof_stringinfo},
+  {"nanosecond",         prof_nanosecond},
   {"help",               prof_help},
   {NULL, NULL}
 };

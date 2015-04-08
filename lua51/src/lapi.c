@@ -691,7 +691,7 @@ LUA_API void lua_marksteps (lua_State *L, lua_Statdata *sd) {
   isd = &G(L)->marksteps;
   sd->max = isd->max;
   sd->min = isd->min;
-  sd->avg = isd->avg;
+  sd->avg = (long)isd->avg;
   sd->cnt = isd->cnt;
 }
 
@@ -702,7 +702,7 @@ LUA_API void lua_sweepstringsteps (lua_State *L, lua_Statdata *sd) {
   isd = &G(L)->sweepstringsteps;
   sd->max = isd->max;
   sd->min = isd->min;
-  sd->avg = isd->avg;
+  sd->avg = (long)isd->avg;
   sd->cnt = isd->cnt;
 }
 
@@ -713,7 +713,7 @@ LUA_API void lua_sweepsteps (lua_State *L, lua_Statdata *sd) {
   isd = &G(L)->sweepsteps;
   sd->max = isd->max;
   sd->min = isd->min;
-  sd->avg = isd->avg;
+  sd->avg = (long)isd->avg;
   sd->cnt = isd->cnt;
 }
 
@@ -724,7 +724,29 @@ LUA_API void lua_finalizesteps (lua_State *L, lua_Statdata *sd) {
   isd = &G(L)->finalizesteps;
   sd->max = isd->max;
   sd->min = isd->min;
-  sd->avg = isd->avg;
+  sd->avg = (long)isd->avg;
+  sd->cnt = isd->cnt;
+}
+
+
+LUA_API void lua_gcperiod (lua_State *L, lua_Statdata *sd) {
+  statdata *isd;
+  if (sd == NULL) return;
+  isd = &G(L)->gcperiod;
+  sd->max = isd->max;
+  sd->min = isd->min;
+  sd->avg = (long)isd->avg;
+  sd->cnt = isd->cnt;
+}
+
+
+LUA_API void lua_nogcperiod (lua_State *L, lua_Statdata *sd) {
+  statdata *isd;
+  if (sd == NULL) return;
+  isd = &G(L)->nogcperiod;
+  sd->max = isd->max;
+  sd->min = isd->min;
+  sd->avg = (long)isd->avg;
   sd->cnt = isd->cnt;
 }
 

@@ -569,6 +569,11 @@ static l_mem singlestep (lua_State *L) {
   /*lua_checkmemory(L);*/
   switch (g->gcstate) {
     case GCSpause: {
+#if LUA_PROFILE
+      long t = luaE_nanosecond();
+      statloop1(&g->nogcperiod, t);
+      statacc1(&g->gcperiod, t);
+#endif
       markroot(L);  /* start a new collection */
       return 0;
     }
@@ -630,12 +635,15 @@ static l_mem singlestep (lua_State *L) {
         return GCFINALIZECOST;
       }
       else {
-        g->gcstate = GCSpause;  /* end collection */
-        g->gcdept = 0;
 #if LUA_PROFILE
+	long t = luaE_nanosecond();
+	statacc1(&g->nogcperiod, t);
+	statloop1(&g->gcperiod, t);
 	statloop(&g->gcsteps);
 	statloop(&g->finalizesteps);
 #endif
+        g->gcstate = GCSpause;  /* end collection */
+        g->gcdept = 0;
         return 0;
       }
     }

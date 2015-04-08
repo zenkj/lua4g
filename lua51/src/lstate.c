@@ -22,6 +22,9 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "ltm.h"
+#if LUA_PROFILE
+#include <time.h>
+#endif
 
 
 #define state_size(x)	(sizeof(x) + LUAI_EXTRASPACE)
@@ -160,6 +163,15 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 }
 
 
+#if LUA_PROFILE
+long luaE_nanosecond () {
+  struct timespec ts;
+  clock_gettime(CLOCK_REALTIME, &ts);
+  return ((long)(ts.tv_sec*1000*1000*1000+ts.tv_nsec));
+}
+#endif
+
+
 LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   int i;
   lua_State *L;
@@ -204,6 +216,9 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   statinit(&g->sweepstringsteps);
   statinit(&g->sweepsteps);
   statinit(&g->finalizesteps);
+  statinit(&g->gcperiod);
+  statinit(&g->nogcperiod);
+  statacc1(&g->nogcperiod, luaE_nanosecond());
   g->allocbytes = 0;
   g->freebytes = 0;
   g->tablecount = 0;

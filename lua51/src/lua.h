@@ -211,6 +211,8 @@ LUA_API void (lua_marksteps) (lua_State *L, lua_Statdata *sd);
 LUA_API void (lua_sweepstringsteps) (lua_State *L, lua_Statdata *sd);
 LUA_API void (lua_sweepsteps) (lua_State *L, lua_Statdata *sd);
 LUA_API void (lua_finalizesteps) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_gcperiod) (lua_State *L, lua_Statdata *sd);
+LUA_API void (lua_nogcperiod) (lua_State *L, lua_Statdata *sd);
 LUA_API void (lua_heapinfo) (lua_State *L, lua_Heapinfo *hi);
 LUA_API void (lua_tableinfo) (lua_State *L, lua_Objectinfo *oi);
 LUA_API void (lua_protoinfo) (lua_State *L, lua_Objectinfo *oi);
