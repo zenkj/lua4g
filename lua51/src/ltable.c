@@ -324,7 +324,7 @@ static void resize (lua_State *L, Table *t, int nasize, int nhsize) {
 #if LUA_PROFILE
   t->resizecount++;
   G(L)->tablebytes += (nasize-oldasize)*sizeof(TValue) \
-		      + (sizenode(t)-twoto(oldhsize))*sizeof(Node);
+		  + (sizenode(t)-(nold!=dummynode?twoto(oldhsize):0))*sizeof(Node);
 #endif
 }
 

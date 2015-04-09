@@ -89,6 +89,7 @@ UpVal *luaF_findupval (lua_State *L, StkId level) {
   lua_assert(uv->u.l.next->u.l.prev == uv && uv->u.l.prev->u.l.next == uv);
 #if LUA_PROFILE
   G(L)->openupvalcount++;
+  G(L)->upvalbytes += sizeof(UpVal);
 #endif
   return uv;
 }

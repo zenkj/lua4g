@@ -44,7 +44,6 @@ LUALIB_API int (luaopen_package) (lua_State *L);
 LUALIB_API int (luaopen_profile) (lua_State *L);
 #endif
 
-
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L); 
 
