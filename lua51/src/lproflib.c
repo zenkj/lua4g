@@ -200,7 +200,7 @@ static int prof_enablelog (lua_State *L) {
   if (n == 0)
     level = 1;
   else if (lua_type(L, 1) == LUA_TNUMBER)
-    level = lua_tointeger(L, 1);
+    level = (int)lua_tointeger(L, 1);
   else level = -1;
   lua_enablelog(L, level);
   return 0;
