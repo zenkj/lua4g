@@ -22,9 +22,6 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "ltm.h"
-#if LUA_PROFILE
-#include <time.h>
-#endif
 
 
 #define state_size(x)	(sizeof(x) + LUAI_EXTRASPACE)
@@ -162,13 +159,16 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
   luaM_freemem(L, fromstate(L1), state_size(lua_State));
 }
 
-
 #if LUA_PROFILE
-long luaE_nanosecond () {
-  struct timespec ts;
-  clock_gettime(CLOCK_REALTIME, &ts);
-  return ((long)(ts.tv_sec*1000*1000*1000+ts.tv_nsec));
+#if defined(LUA_WIN)
+#include <windows.h>
+static lua_Number clockfreq () {
+  LARGE_INTEGER freq;
+  if (QueryPerformanceFrequency(&freq))
+    return (lua_Number)freq.QuadPart/(1000*1000*1000);
+  return (lua_Number)0;
 }
+#endif
 #endif
 
 
@@ -218,9 +218,16 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   statinit(&g->finalizesteps);
   statinit(&g->gcperiod);
   statinit(&g->nogcperiod);
-  statacc1(&g->nogcperiod, luaE_nanosecond());
-  g->allocbytes = 0;
+  g->allocbytes = state_size(LG);
   g->freebytes = 0;
+  g->tablebytes = 0;
+  g->protobytes = 0;
+  g->lclosurebytes = 0;
+  g->cclosurebytes = 0;
+  g->threadbytes = state_size(LG);
+  g->upvalbytes = 0;
+  g->udatabytes = 0;
+  g->stringbytes = 0;
   g->tablecount = 0;
   g->protocount = 0;
   g->lclosurecount = 0;
@@ -230,14 +237,13 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   g->closeupvalcount = 0;
   g->udatacount = 0;
   g->stringcount = 0;
-  g->tablebytes = 0;
-  g->protobytes = 0;
-  g->lclosurebytes = 0;
-  g->cclosurebytes = 0;
-  g->threadbytes = state_size(LG);
-  g->upvalbytes = 0;
-  g->udatabytes = 0;
-  g->stringbytes = 0;
+#if defined(LUA_WIN)
+  g->clockfreq = clockfreq();
+#else
+  g->clockfreq = (lua_Number)0;
+#endif
+  /* on Windows, lua_nanosecond needs g->clockfreq */
+  statacc1(&g->nogcperiod, lua_nanosecond(L));
 #endif
   for (i=0; i<NUM_TAGS; i++) g->mt[i] = NULL;
   if (luaD_rawrunprotected(L, f_luaopen, NULL) != 0) {

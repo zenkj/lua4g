@@ -570,7 +570,7 @@ static l_mem singlestep (lua_State *L) {
   switch (g->gcstate) {
     case GCSpause: {
 #if LUA_PROFILE
-      long t = luaE_nanosecond();
+      lua_Number t = lua_nanosecond(L);
       statloop1(&g->nogcperiod, t);
       statacc1(&g->gcperiod, t);
 #endif
@@ -636,7 +636,7 @@ static l_mem singlestep (lua_State *L) {
       }
       else {
 #if LUA_PROFILE
-	long t = luaE_nanosecond();
+	lua_Number t = lua_nanosecond(L);
 	statacc1(&g->nogcperiod, t);
 	statloop1(&g->gcperiod, t);
 	statloop(&g->gcsteps);

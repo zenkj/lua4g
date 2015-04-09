@@ -14,7 +14,6 @@
 
 
 #if LUA_PROFILE
-#include <time.h>
 
 static int prof_stackresizecount (lua_State *L) {
   int n = lua_gettop(L);
@@ -45,9 +44,9 @@ static int prof_tableresizecount (lua_State *L) {
 static int prof_gcsteps (lua_State *L) {
   lua_Statdata sd;
   lua_gcsteps(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -55,9 +54,9 @@ static int prof_gcsteps (lua_State *L) {
 static int prof_marksteps (lua_State *L) {
   lua_Statdata sd;
   lua_marksteps(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -65,9 +64,9 @@ static int prof_marksteps (lua_State *L) {
 static int prof_sweepstringsteps (lua_State *L) {
   lua_Statdata sd;
   lua_sweepstringsteps(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -75,9 +74,9 @@ static int prof_sweepstringsteps (lua_State *L) {
 static int prof_sweepsteps (lua_State *L) {
   lua_Statdata sd;
   lua_sweepsteps(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -85,9 +84,9 @@ static int prof_sweepsteps (lua_State *L) {
 static int prof_finalizesteps (lua_State *L) {
   lua_Statdata sd;
   lua_finalizesteps(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -95,9 +94,9 @@ static int prof_finalizesteps (lua_State *L) {
 static int prof_gcperiod (lua_State *L) {
   lua_Statdata sd;
   lua_gcperiod(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -105,9 +104,9 @@ static int prof_gcperiod (lua_State *L) {
 static int prof_nogcperiod (lua_State *L) {
   lua_Statdata sd;
   lua_nogcperiod(L, &sd);
-  lua_pushinteger(L, sd.max);
-  lua_pushinteger(L, sd.min);
-  lua_pushinteger(L, sd.avg);
+  lua_pushnumber(L, sd.max);
+  lua_pushnumber(L, sd.min);
+  lua_pushnumber(L, sd.avg);
   lua_pushinteger(L, sd.cnt);
   return 4;
 }
@@ -115,9 +114,9 @@ static int prof_nogcperiod (lua_State *L) {
 static int prof_heapinfo (lua_State *L) {
   lua_Heapinfo hi;
   lua_heapinfo(L, &hi);
-  lua_pushinteger(L, hi.allocbytes);
-  lua_pushinteger(L, hi.freebytes);
-  lua_pushinteger(L, hi.totalbytes);
+  lua_pushnumber(L, hi.allocbytes);
+  lua_pushnumber(L, hi.freebytes);
+  lua_pushnumber(L, hi.totalbytes);
   lua_pushinteger(L, hi.totalcount);
   return 4;
 }
@@ -126,7 +125,7 @@ static int prof_tableinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_tableinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 2;
 }
 
@@ -134,7 +133,7 @@ static int prof_protoinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_protoinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 2;
 }
 
@@ -142,13 +141,13 @@ static int prof_closureinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_closureinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   lua_cclosureinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   lua_lclosureinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 6;
 }
 
@@ -156,7 +155,7 @@ static int prof_threadinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_threadinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 2;
 }
 
@@ -164,13 +163,13 @@ static int prof_upvalinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_upvalinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   lua_openupvalinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   lua_closeupvalinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 6;
 }
 
@@ -178,7 +177,7 @@ static int prof_userdatainfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_userdatainfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 2;
 }
 
@@ -186,14 +185,12 @@ static int prof_stringinfo (lua_State *L) {
   lua_Objectinfo oi;
   lua_stringinfo(L, &oi);
   lua_pushinteger(L, oi.count);
-  lua_pushinteger(L, oi.bytes);
+  lua_pushnumber(L, oi.bytes);
   return 2;
 }
 
 static int prof_nanosecond (lua_State *L) {
-  struct timespec ts;
-  clock_gettime(CLOCK_REALTIME, &ts);
-  lua_pushnumber(L, (lua_Number)(ts.tv_sec*1000*1000*1000)+(lua_Number)ts.tv_nsec);
+  lua_pushnumber(L, lua_nanosecond(L));
   return 1;
 }
 
@@ -229,7 +226,8 @@ static int prof_help (lua_State *L) {
     "                          closed upval number/closed upval size.\n"
     "userdatainfo():           userdata number/total userdata object size.\n"
     "stringinfo():             string number/total string object size.\n"
-    "nanosecond():             nanoseconds from clock_gettime(REALTIME).\n"
+    "nanosecond():             nanoseconds from clock_gettime(POSIX) or \n"
+    "                          QueryPerformanceCounter(Windows).\n"
     "help():                   display this help message.\n");
 
   return 1;
