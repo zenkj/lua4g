@@ -254,7 +254,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
    * initialize g->starttime which should be 0 then */
   g->starttime = lua_nanosecond(L);
 
-  lualog(L, 1, "lua created");
+  /* lualog(L, 1, "lua created"); -- no use because loglevel = 0 */
 #endif
 
   for (i=0; i<NUM_TAGS; i++) g->mt[i] = NULL;
